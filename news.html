@@ -1,823 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الأخبار - SportsPulse | آخر أخبار الرياضة العالمية والعربية</title>
-    <meta name="description" content="تابع آخر أخبار الرياضة العالمية والعربية، تحليلات المباريات، وأخبار اللاعبين - جميعها في SportsPulse">
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-    
-    <style>
-        :root {
-            --primary-dark: #1a1a2e;
-            --secondary-dark: #16213e;
-            --accent-orange: #ff6b35;
-            --accent-gold: #ffd700;
-            --text-white: #ffffff;
-            --text-gray: #b8b8b8;
-            --bg-dark: #0f0f23;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-white);
-            overflow-x: hidden;
-        }
-        
-        .font-arabic {
-            font-family: 'Poppins', sans-serif;
-        }
-        
-        .gradient-text {
-            background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .news-card {
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .news-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 30px rgba(255, 107, 53, 0.2);
-            border-color: var(--accent-orange);
-        }
-        
-        .nav-link {
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--accent-orange);
-            transition: width 0.3s ease;
-        }
-        
-        .nav-link:hover::after {
-            width: 100%;
-        }
-        
-        .filter-btn {
-            transition: all 0.3s ease;
-        }
-        
-        .filter-btn.active {
-            background: var(--accent-orange);
-            color: white;
-        }
-        
-        .mobile-menu {
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-        }
-        
-        .mobile-menu.active {
-            transform: translateX(0);
-        }
-        
-        .search-box {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .search-box:focus {
-            border-color: var(--accent-orange);
-            box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
-        }
-        
-        .featured-badge {
-            background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
-        }
-        
-        .category-badge {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-weight: 600;
-        }
-        
-        .line-clamp-3 {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-    </style>
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="bg-black/90 backdrop-blur-sm fixed w-full top-0 z-50 border-b border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <div class="flex items-center">
-                    <h1 class="text-2xl font-bold font-arabic">
-                        <a href="index.html">
-                            <span class="gradient-text">Sports</span><span class="text-white">Pulse</span>
-                        </a>
-                    </h1>
-                </div>
-                
-                <!-- Desktop Navigation -->
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="index.html" class="nav-link text-gray-300 hover:text-orange-400 font-medium">الرئيسية</a>
-                    <a href="matches.html" class="nav-link text-gray-300 hover:text-orange-400 font-medium">المباريات</a>
-                    <a href="news.html" class="nav-link text-white hover:text-orange-400 font-medium">الأخبار</a>
-                    <a href="about.html" class="nav-link text-gray-300 hover:text-orange-400 font-medium">من نحن</a>
-                    <a href="contact.html" class="nav-link text-gray-300 hover:text-orange-400 font-medium">اتصل بنا</a>
-                    
-                    <!-- Dark Mode Toggle -->
-                    <button id="darkModeToggle" class="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors">
-                        <span class="text-yellow-400">🌙</span>
-                    </button>
-                </div>
-                
-                <!-- Mobile Menu Button -->
-                <div class="md:hidden">
-                    <button id="mobileMenuBtn" class="text-white p-2">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Mobile Menu -->
-        <div id="mobileMenu" class="mobile-menu fixed top-0 right-0 h-full w-64 bg-black z-50 md:hidden">
-            <div class="p-4">
-                <button id="closeMobileMenu" class="text-white mb-8">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-                <div class="space-y-4">
-                    <a href="index.html" class="block text-gray-300 hover:text-orange-400 font-medium py-2">الرئيسية</a>
-                    <a href="matches.html" class="block text-gray-300 hover:text-orange-400 font-medium py-2">المباريات</a>
-                    <a href="news.html" class="block text-white hover:text-orange-400 font-medium py-2">الأخبار</a>
-                    <a href="about.html" class="block text-gray-300 hover:text-orange-400 font-medium py-2">من نحن</a>
-                    <a href="contact.html" class="block text-gray-300 hover:text-orange-400 font-medium py-2">اتصل بنا</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Header Section -->
-    <section class="pt-24 pb-12 bg-gradient-to-b from-gray-900 to-black">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h1 class="text-4xl md:text-6xl font-bold font-arabic mb-4">
-                    <span class="gradient-text">الأخبار</span>
-                </h1>
-                <p class="text-gray-400 text-lg max-w-2xl mx-auto">
-                    آخر أخبار الرياضة العالمية والعربية، تحليلات المباريات، وأخبار اللاعبين
-                </p>
-            </div>
-            
-            <!-- Search and Filter Section -->
-            <div class="max-w-4xl mx-auto">
-                <!-- Search Box -->
-                <div class="mb-8">
-                    <div class="relative">
-                        <input type="text" 
-                               id="searchInput"
-                               placeholder="ابحث في الأخبار..." 
-                               class="search-box w-full px-6 py-4 pr-12 rounded-lg text-white placeholder-gray-400 focus:outline-none">
-                        <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                    </div>
-                </div>
-                
-                <!-- Category Filters -->
-                <div class="flex flex-wrap justify-center gap-3 mb-8">
-                    <button class="filter-btn active px-6 py-3 rounded-lg bg-gray-800 text-white font-semibold" data-category="all">
-                        جميع الأخبار
-                    </button>
-                    <button class="filter-btn px-6 py-3 rounded-lg bg-gray-800 text-gray-300 font-semibold" data-category="football">
-                        كرة قدم
-                    </button>
-                    <button class="filter-btn px-6 py-3 rounded-lg bg-gray-800 text-gray-300 font-semibold" data-category="basketball">
-                        كرة سلة
-                    </button>
-                    <button class="filter-btn px-6 py-3 rounded-lg bg-gray-800 text-gray-300 font-semibold" data-category="tennis">
-                        تنس
-                    </button>
-                    <button class="filter-btn px-6 py-3 rounded-lg bg-gray-800 text-gray-300 font-semibold" data-category="formula1">
-                        فورمولا 1
-                    </button>
-                    <button class="filter-btn px-6 py-3 rounded-lg bg-gray-800 text-gray-300 font-semibold" data-category="analysis">
-                        تحليلات
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Featured News Section -->
-    <section class="py-12 bg-black">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold font-arabic text-white mb-8">الأخبار المميزة</h2>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-                <!-- Main Featured Article -->
-                <article class="news-card bg-gray-800 rounded-xl overflow-hidden cursor-pointer lg:col-span-2" data-category="football">
-                    <div class="flex flex-col lg:flex-row">
-                        <div class="lg:w-1/2 relative">
-                            <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/37bfbfa9c19211d48231c99b5c7af7efaec2cf8d.jpg" 
-                                 alt="لاعب كرة قدم" 
-                                 class="w-full h-64 lg:h-full object-cover">
-                            <div class="featured-badge absolute top-4 right-4 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                مميز
-                            </div>
-                            <div class="absolute top-4 left-4 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                كرة قدم
-                            </div>
-                        </div>
-                        <div class="lg:w-1/2 p-8">
-                            <h3 class="text-2xl font-bold font-arabic mb-4 text-white hover:text-orange-400 transition-colors">
-                                فوز تاريخي للمنتخب الوطني في افتتاح البطولة القارية
-                            </h3>
-                            <p class="text-gray-400 mb-6 line-clamp-3">
-                                حقق المنتخب الوطني فوزاً تاريخياً في مباراة الافتتاح ضمن البطولة القارية، حيث قدم أداءً رائعاً أبهر به جماهيره. المدير الفني للفريق أشاد باللاعبين ووعد الجماهير بمفاجآت أكبر في المباريات القادمة.
-                            </p>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/37bfbfa9c19211d48231c99b5c7af7efaec2cf8d.jpg" 
-                                         alt="كاتب" 
-                                         class="w-10 h-10 rounded-full mr-3">
-                                    <div>
-                                        <p class="text-white font-semibold">محمد أحمد</p>
-                                        <p class="text-gray-400 text-sm">منذ ساعتين</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center text-gray-400">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                    </svg>
-                                    <span class="text-sm">2.5k</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-            </div>
-        </div>
-    </section>
-
-    <!-- All News Section -->
-    <section class="py-12 bg-gradient-to-b from-black to-gray-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold font-arabic text-white mb-8">جميع الأخبار</h2>
-            
-            <div id="newsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- News Card 1 -->
-                <article class="news-card bg-gray-800 rounded-xl overflow-hidden cursor-pointer" data-category="football">
-                    <div class="relative">
-                        <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/89f28affcc7354293c7000712789d9b60bf67686.jpg" 
-                             alt="ملعب كرة قدم" 
-                             class="w-full h-48 object-cover">
-                        <div class="absolute top-4 right-4 bg-blue-500 text-white category-badge">
-                            دوري أبطال أوروبا
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold font-arabic mb-3 text-white hover:text-orange-400 transition-colors">
-                            مفاجأة كبرى في دوري الأبطال
-                        </h3>
-                        <p class="text-gray-400 mb-4 line-clamp-3">
-                            شهدت مباريات دوري الأبطال مفاجأة من العيار الثقيل بعد خسارة الفريق المتصدر أمام منافسه التقليدي في مباراة مليئة بالأحداث.
-                        </p>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/37bfbfa9c19211d48231c99b5c7af7efaec2cf8d.jpg" 
-                                     alt="كاتب" 
-                                     class="w-8 h-8 rounded-full mr-2">
-                                <span class="text-sm text-gray-400">سارة محمد</span>
-                            </div>
-                            <span class="text-sm text-gray-500">منذ 5 ساعات</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- News Card 2 -->
-                <article class="news-card bg-gray-800 rounded-xl overflow-hidden cursor-pointer" data-category="basketball">
-                    <div class="relative">
-                        <img src="https://kimi-web-img.moonshot.cn/img/img.freepik.com/214bbcfbf546629e029efe87fcae1945fba45b96.jpg" 
-                             alt="لاعب كرة سلة" 
-                             class="w-full h-48 object-cover">
-                        <div class="absolute top-4 right-4 bg-green-500 text-white category-badge">
-                            كرة سلة
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold font-arabic mb-3 text-white hover:text-orange-400 transition-colors">
-                            نجم السلة الجديد يخطف الأضواء
-                        </h3>
-                        <p class="text-gray-400 mb-4 line-clamp-3">
-                            اللاعب الشاب يوسف أحمد يخطف الأضواء في الدوري الأمريكي للمحترفين بعد تسجيله 40 نقطة في مباراة واحدة أمام فريق البطل.
-                        </p>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/37bfbfa9c19211d48231c99b5c7af7efaec2cf8d.jpg" 
-                                     alt="كاتب" 
-                                     class="w-8 h-8 rounded-full mr-2">
-                                <span class="text-sm text-gray-400">أحمد يوسف</span>
-                            </div>
-                            <span class="text-sm text-gray-500">منذ 7 ساعات</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- News Card 3 -->
-                <article class="news-card bg-gray-800 rounded-xl overflow-hidden cursor-pointer" data-category="formula1">
-                    <div class="relative">
-                        <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/89f28affcc7354293c7000712789d9b60bf67686.jpg" 
-                             alt="سيارة فورمولا 1" 
-                             class="w-full h-48 object-cover">
-                        <div class="absolute top-4 right-4 bg-purple-500 text-white category-badge">
-                            فورمولا 1
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold font-arabic mb-3 text-white hover:text-orange-400 transition-colors">
-                            فريق مرسيدس يعلن عن تحديثات جديدة
-                        </h3>
-                        <p class="text-gray-400 mb-4 line-clamp-3">
-                            أعلن فريق مرسيدس عن سلسلة من التحديثات التقنية على سيارته قبل الجولة القادمة من بطولة العالم للفورمولا 1.
-                        </p>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/37bfbfa9c19211d48231c99b5c7af7efaec2cf8d.jpg" 
-                                     alt="كاتب" 
-                                     class="w-8 h-8 rounded-full mr-2">
-                                <span class="text-sm text-gray-400">خالد علي</span>
-                            </div>
-                            <span class="text-sm text-gray-500">منذ 9 ساعات</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- News Card 4 -->
-                <article class="news-card bg-gray-800 rounded-xl overflow-hidden cursor-pointer" data-category="analysis">
-                    <div class="relative">
-                        <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/37bfbfa9c19211d48231c99b5c7af7efaec2cf8d.jpg" 
-                             alt="محلل رياضي" 
-                             class="w-full h-48 object-cover">
-                        <div class="absolute top-4 right-4 bg-indigo-500 text-white category-badge">
-                            تحليلات
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold font-arabic mb-3 text-white hover:text-orange-400 transition-colors">
-                            لماذا فشلت استراتيجية الفريق الملكي؟
-                        </h3>
-                        <p class="text-gray-400 mb-4 line-clamp-3">
-                            تحليل عميق للأخطاء التكتيكية التي أدت إلى الهزيمة الثقيلة أمام الغريم التقليدي في مباراة القمة.
-                        </p>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/37bfbfa9c19211d48231c99b5c7af7efaec2cf8d.jpg" 
-                                     alt="كاتب" 
-                                     class="w-8 h-8 rounded-full mr-2">
-                                <span class="text-sm text-gray-400">د. أحمد محمد</span>
-                            </div>
-                            <span class="text-sm text-gray-500">منذ 11 ساعة</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- News Card 5 -->
-                <article class="news-card bg-gray-800 rounded-xl overflow-hidden cursor-pointer" data-category="football">
-                    <div class="relative">
-                        <img src="https://kimi-web-img.moonshot.cn/img/img.freepik.com/7eabd676bec428499ae741ae0fa8c5385968b70a.jpg" 
-                             alt="ملعب رياضي" 
-                             class="w-full h-48 object-cover">
-                        <div class="absolute top-4 right-4 bg-orange-500 text-white category-badge">
-                            كرة قدم
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold font-arabic mb-3 text-white hover:text-orange-400 transition-colors">
-                            انتقالات الصيف المرتقبة في أوروبا
-                        </h3>
-                        <p class="text-gray-400 mb-4 line-clamp-3">
-                            مركز أخبار الانتقالات يرصد أبرز الصفقات المتوقعة في سوق الانتقالات الصيفية للأندية الأوروبية الكبرى.
-                        </p>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/37bfbfa9c19211d48231c99b5c7af7efaec2cf8d.jpg" 
-                                     alt="كاتب" 
-                                     class="w-8 h-8 rounded-full mr-2">
-                                <span class="text-sm text-gray-400">محمود سعيد</span>
-                            </div>
-                            <span class="text-sm text-gray-500">منذ 13 ساعة</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- News Card 6 -->
-                <article class="news-card bg-gray-800 rounded-xl overflow-hidden cursor-pointer" data-category="tennis">
-                    <div class="relative">
-                        <img src="https://kimi-web-img.moonshot.cn/img/img.freepik.com/57463f8688b0ff0f93b58ee28183e16e999a4cb1.jpg" 
-                             alt="لاعب تنس" 
-                             class="w-full h-48 object-cover">
-                        <div class="absolute top-4 right-4 bg-yellow-500 text-white category-badge">
-                            تنس
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold font-arabic mb-3 text-white hover:text-orange-400 transition-colors">
-                            نجوم التنس يستعدون لبطولة ويمبلدون
-                        </h3>
-                        <p class="text-gray-400 mb-4 line-clamp-3">
-                            أكبر نجوم التنس في العالم يستعدون لخوض بطولة ويمبلدون التاريخية وسط توقعات بمنافسة شرسة على اللقب.
-                        </p>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/37bfbfa9c19211d48231c99b5c7af7efaec2cf8d.jpg" 
-                                     alt="كاتب" 
-                                     class="w-8 h-8 rounded-full mr-2">
-                                <span class="text-sm text-gray-400">ليلى أحمد</span>
-                            </div>
-                            <span class="text-sm text-gray-500">منذ 15 ساعة</span>
-                        </div>
-                    </div>
-                </article>
-            </div>
-            
-            <!-- Load More Button -->
-            <div class="text-center mt-12">
-                <button id="loadMoreBtn" class="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-orange-700 transition-all">
-                    تحميل المزيد من الأخبار
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-black py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- Logo & Description -->
-                <div class="md:col-span-2">
-                    <h3 class="text-3xl font-bold font-arabic mb-4">
-                        <span class="gradient-text">Sports</span><span class="text-white">Pulse</span>
-                    </h3>
-                    <p class="text-gray-400 mb-6 max-w-md">
-                        بوابتك الشاملة للعالم الرياضي. نقدم لك آخر الأخبار، النتائج الحية، والتحليلات العميقة مع التزامنا بالجودة والدقة.
-                    </p>
-                    
-                    <!-- Social Links -->
-                    <div class="flex space-x-4">
-                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors">
-                            <span class="text-white">f</span>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors">
-                            <span class="text-white">t</span>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors">
-                            <span class="text-white">i</span>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors">
-                            <span class="text-white">y</span>
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Quick Links -->
-                <div>
-                    <h4 class="text-lg font-bold text-white mb-4">روابط سريعة</h4>
-                    <ul class="space-y-3">
-                        <li><a href="index.html" class="text-gray-400 hover:text-orange-400 transition-colors">الرئيسية</a></li>
-                        <li><a href="matches.html" class="text-gray-400 hover:text-orange-400 transition-colors">المباريات</a></li>
-                        <li><a href="news.html" class="text-gray-400 hover:text-orange-400 transition-colors">الأخبار</a></li>
-                        <li><a href="about.html" class="text-gray-400 hover:text-orange-400 transition-colors">من نحن</a></li>
-                        <li><a href="contact.html" class="text-gray-400 hover:text-orange-400 transition-colors">اتصل بنا</a></li>
-                    </ul>
-                </div>
-                
-                <!-- Categories -->
-                <div>
-                    <h4 class="text-lg font-bold text-white mb-4">الفئات</h4>
-                    <ul class="space-y-3">
-                        <li><a href="#" class="text-gray-400 hover:text-orange-400 transition-colors">كرة قدم</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-orange-400 transition-colors">كرة سلة</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-orange-400 transition-colors">تنس</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-orange-400 transition-colors">فورمولا 1</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-orange-400 transition-colors">رياضات أخرى</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="border-t border-gray-800 mt-12 pt-8 text-center">
-                <p class="text-gray-400">
-                    © 2024 SportsPulse. جميع الحقوق محفوظة | تصميم وتطوير بروفشنال
-                </p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="main.js"></script>
-    <script>
-        // News page specific functionality
-        class NewsPage {
-            constructor() {
-                this.allNews = [];
-                this.filteredNews = [];
-                this.currentPage = 1;
-                this.newsPerPage = 6;
-                
-                this.initializeNews();
-                this.setupSearch();
-                this.setupFilters();
-                this.setupLoadMore();
-            }
-
-            initializeNews() {
-                // Sample news data (in real app, this would come from API)
-                this.allNews = [
-                    {
-                        id: 1,
-                        title: 'فوز تاريخي للمنتخب الوطني في افتتاح البطولة القارية',
-                        content: 'حقق المنتخب الوطني فوزاً تاريخياً في مباراة الافتتاح ضمن البطولة القارية، حيث قدم أداءً رائعاً أبهر به جماهيره.',
-                        image: 'https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/37bfbfa9c19211d48231c99b5c7af7efaec2cf8d.jpg',
-                        category: 'football',
-                        author: 'محمد أحمد',
-                        date: 'منذ ساعتين',
-                        views: '2.5k',
-                        featured: true
-                    },
-                    {
-                        id: 2,
-                        title: 'مفاجأة كبرى في دوري الأبطال',
-                        content: 'شهدت مباريات دوري الأبطال مفاجأة من العيار الثقيل بعد خسارة الفريق المتصدر أمام منافسه التقليدي.',
-                        image: 'https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/89f28affcc7354293c7000712789d9b60bf67686.jpg',
-                        category: 'football',
-                        author: 'سارة محمد',
-                        date: 'منذ 5 ساعات',
-                        views: '1.8k',
-                        featured: false
-                    },
-                    {
-                        id: 3,
-                        title: 'نجم السلة الجديد يخطف الأضواء',
-                        content: 'اللاعب الشاب يوسف أحمد يخطف الأضواء في الدوري الأمريكي للمحترفين بعد تسجيله 40 نقطة في مباراة واحدة.',
-                        image: 'https://kimi-web-img.moonshot.cn/img/img.freepik.com/214bbcfbf546629e029efe87fcae1945fba45b96.jpg',
-                        category: 'basketball',
-                        author: 'أحمد يوسف',
-                        date: 'منذ 7 ساعات',
-                        views: '3.2k',
-                        featured: false
-                    },
-                    {
-                        id: 4,
-                        title: 'فريق مرسيدس يعلن عن تحديثات جديدة',
-                        content: 'أعلن فريق مرسيدس عن سلسلة من التحديثات التقنية على سيارته قبل الجولة القادمة من بطولة العالم للفورمولا 1.',
-                        image: 'https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/89f28affcc7354293c7000712789d9b60bf67686.jpg',
-                        category: 'formula1',
-                        author: 'خالد علي',
-                        date: 'منذ 9 ساعات',
-                        views: '1.5k',
-                        featured: false
-                    },
-                    {
-                        id: 5,
-                        title: 'لماذا فشلت استراتيجية الفريق الملكي؟',
-                        content: 'تحليل عميق للأخطاء التكتيكية التي أدت إلى الهزيمة الثقيلة أمام الغريم التقليدي في مباراة القمة.',
-                        image: 'https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/37bfbfa9c19211d48231c99b5c7af7efaec2cf8d.jpg',
-                        category: 'analysis',
-                        author: 'د. أحمد محمد',
-                        date: 'منذ 11 ساعة',
-                        views: '2.1k',
-                        featured: false
-                    },
-                    {
-                        id: 6,
-                        title: 'انتقالات الصيف المرتقبة في أوروبا',
-                        content: 'مركز أخبار الانتقالات يرصد أبرز الصفقات المتوقعة في سوق الانتقالات الصيفية للأندية الأوروبية الكبرى.',
-                        image: 'https://kimi-web-img.moonshot.cn/img/img.freepik.com/7eabd676bec428499ae741ae0fa8c5385968b70a.jpg',
-                        category: 'football',
-                        author: 'محمود سعيد',
-                        date: 'منذ 13 ساعة',
-                        views: '1.9k',
-                        featured: false
-                    },
-                    {
-                        id: 7,
-                        title: 'نجوم التنس يستعدون لبطولة ويمبلدون',
-                        content: 'أكبر نجوم التنس في العالم يستعدون لخوض بطولة ويمبلدون التاريخية وسط توقعات بمنافسة شرسة على اللقب.',
-                        image: 'https://kimi-web-img.moonshot.cn/img/img.freepik.com/57463f8688b0ff0f93b58ee28183e16e999a4cb1.jpg',
-                        category: 'tennis',
-                        author: 'ليلى أحمد',
-                        date: 'منذ 15 ساعة',
-                        views: '1.7k',
-                        featured: false
-                    }
-                ];
-
-                this.filteredNews = [...this.allNews];
-                this.renderNews();
-            }
-
-            setupSearch() {
-                const searchInput = document.getElementById('searchInput');
-                if (searchInput) {
-                    searchInput.addEventListener('input', (e) => {
-                        const searchTerm = e.target.value.toLowerCase();
-                        this.filterNews(searchTerm, this.getCurrentCategory());
-                    });
-                }
-            }
-
-            setupFilters() {
-                const filterButtons = document.querySelectorAll('.filter-btn');
-                filterButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        // Update active button
-                        filterButtons.forEach(btn => btn.classList.remove('active'));
-                        button.classList.add('active');
-
-                        const category = button.dataset.category;
-                        const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
-                        
-                        this.filterNews(searchTerm, category);
-                    });
-                });
-            }
-
-            getCurrentCategory() {
-                const activeButton = document.querySelector('.filter-btn.active');
-                return activeButton ? activeButton.dataset.category : 'all';
-            }
-
-            filterNews(searchTerm, category) {
-                this.filteredNews = this.allNews.filter(news => {
-                    const matchesSearch = news.title.toLowerCase().includes(searchTerm) || 
-                                        news.content.toLowerCase().includes(searchTerm);
-                    const matchesCategory = category === 'all' || news.category === category;
-                    
-                    return matchesSearch && matchesCategory;
-                });
-
-                this.currentPage = 1;
-                this.renderNews();
-            }
-
-            renderNews() {
-                const newsGrid = document.getElementById('newsGrid');
-                if (!newsGrid) return;
-
-                const startIndex = 0;
-                const endIndex = this.currentPage * this.newsPerPage;
-                const newsToShow = this.filteredNews.slice(startIndex, endIndex);
-
-                newsGrid.innerHTML = '';
-
-                newsToShow.forEach((news, index) => {
-                    const newsCard = this.createNewsCard(news);
-                    newsGrid.appendChild(newsCard);
-
-                    // Animate card appearance
-                    anime({
-                        targets: newsCard,
-                        opacity: [0, 1],
-                        translateY: [30, 0],
-                        delay: index * 100,
-                        duration: 600,
-                        easing: 'easeOutExpo'
-                    });
-                });
-
-                // Update load more button
-                this.updateLoadMoreButton();
-            }
-
-            createNewsCard(news) {
-                const article = document.createElement('article');
-                article.className = 'news-card bg-gray-800 rounded-xl overflow-hidden cursor-pointer';
-                article.dataset.category = news.category;
-
-                const categoryColors = {
-                    football: 'bg-orange-500',
-                    basketball: 'bg-green-500',
-                    tennis: 'bg-yellow-500',
-                    formula1: 'bg-purple-500',
-                    analysis: 'bg-indigo-500'
-                };
-
-                const categoryNames = {
-                    football: 'كرة قدم',
-                    basketball: 'كرة سلة',
-                    tennis: 'تنس',
-                    formula1: 'فورمولا 1',
-                    analysis: 'تحليلات'
-                };
-
-                article.innerHTML = `
-                    <div class="relative">
-                        <img src="${news.image}" 
-                             alt="${news.title}" 
-                             class="w-full h-48 object-cover">
-                        <div class="absolute top-4 right-4 ${categoryColors[news.category]} text-white category-badge">
-                            ${categoryNames[news.category]}
-                        </div>
-                        ${news.featured ? '<div class="featured-badge absolute top-4 left-4 text-white px-3 py-1 rounded-full text-sm font-semibold">مميز</div>' : ''}
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold font-arabic mb-3 text-white hover:text-orange-400 transition-colors">
-                            ${news.title}
-                        </h3>
-                        <p class="text-gray-400 mb-4 line-clamp-3">
-                            ${news.content}
-                        </p>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/37bfbfa9c19211d48231c99b5c7af7efaec2cf8d.jpg" 
-                                     alt="كاتب" 
-                                     class="w-8 h-8 rounded-full mr-2">
-                                <span class="text-sm text-gray-400">${news.author}</span>
-                            </div>
-                            <span class="text-sm text-gray-500">${news.date}</span>
-                        </div>
-                    </div>
-                `;
-
-                // Add click handler
-                article.addEventListener('click', () => {
-                    this.openNewsDetail(news);
-                });
-
-                return article;
-            }
-
-            openNewsDetail(news) {
-                // In a real app, this would navigate to the news detail page
-                if (window.sportsPulse) {
-                    window.sportsPulse.showNotification(`جاري فتح ${news.title}...`, 'info');
-                }
-                
-                // Simulate navigation delay
-                setTimeout(() => {
-                    // window.location.href = `news-detail.html?id=${news.id}`;
-                }, 1000);
-            }
-
-            setupLoadMore() {
-                const loadMoreBtn = document.getElementById('loadMoreBtn');
-                if (loadMoreBtn) {
-                    loadMoreBtn.addEventListener('click', () => {
-                        this.currentPage++;
-                        this.renderNews();
-                    });
-                }
-            }
-
-            updateLoadMoreButton() {
-                const loadMoreBtn = document.getElementById('loadMoreBtn');
-                if (!loadMoreBtn) return;
-
-                const totalPages = Math.ceil(this.filteredNews.length / this.newsPerPage);
-                
-                if (this.currentPage >= totalPages) {
-                    loadMoreBtn.style.display = 'none';
-                } else {
-                    loadMoreBtn.style.display = 'inline-block';
-                    loadMoreBtn.textContent = `تحميل المزيد (${this.filteredNews.length - (this.currentPage * this.newsPerPage)} خبر متبقي)`;
-                }
-            }
-        }
-
-        // Initialize news page when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            window.newsPage = new NewsPage();
-        });
-    </script>
-</body>
-</html>
