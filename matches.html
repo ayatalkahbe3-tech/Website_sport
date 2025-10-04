@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المباريات - SportsPulse | النتائج الحية والمباريات القادمة</title>
+    <meta name="description" content="تابع النتائج الحية للمباريات، جدول المباريات القادمة، وآخر أخبار الرياضة - جميعها في SportsPulse">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-dark: #1a1a2e;
+            --secondary-dark: #16213e;
+            --accent-orange: #ff6b35;
+            --accent-gold: #ffd700;
+            --text-white: #ffffff;
+            --text-gray: #b8b8b8;
+            --bg-dark: #0f0f23;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-white);
+            overflow-x: hidden;
+        }
+        
+        .font-arabic {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .match-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .match-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(255, 107, 53, 0.2);
+            border-color: var(--accent-orange);
+        }
+        
+        .live-indicator {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .score-update {
+            animation: scoreFlash 0.6s ease-in-out;
+        }
+        
+        @keyframes scoreFlash {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); color: var(--accent-orange); }
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-orange);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .filter-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn.active {
+            background: var(--accent-orange);
+            color: white;
+        }
+        
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+        
+        .competition-tabs {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+        
+        .competition-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .competition-tabs::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+        
+        .competition-tabs::-webkit-scrollbar-thumb {
+            background: var(--accent-orange);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-black/90 backdrop-blur-sm fixed w-full top-0 z-50 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold font-arabic">
+                        <a href="index.html">
+                            <span class="gradient-text">Sports</span><span class="text-white">Pulse</span>
+                        </a>
+                    </h1>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link text-gray-300 hover:text-orange-400 font-medium">الرئيسية</a>
+                    <a href="matches.html" class="nav-link text-white hover:text-orange-400 font-medium">المباريات</a>
+                    <a href="news.html" class="nav-link text-gray-300 hover:text-orange-400 font-medium">الأخبار</a>
+                    <a href="about.html" class="nav-link text-gray-300 hover:text-orange-400 font-medium">من نحن</a>
+                    <a href="contact.html" class="nav-link text-gray-300 hover:text-orange-400 font-medium">اتصل بنا</a>
+                    
+                    <!-- Dark Mode Toggle -->
+                    <button id="darkModeToggle" class="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors">
+                        <span class="text-yellow-400">🌙</span>
+                    </button>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="mobileMenuBtn" class="text-white p-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="mobile-menu fixed top-0 right-0 h-full w-64 bg-black z-50 md:hidden">
+            <div class="p-4">
+                <button id="closeMobileMenu" class="text-white mb-8">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                <div class="space-y-4">
+                    <a href="index.html" class="block text-gray-300 hover:text-orange-400 font-medium py-2">الرئيسية</a>
+                    <a href="matches.html" class="block text-white hover:text-orange-400 font-medium py-2">المباريات</a>
+                    <a href="news.html" class="block text-gray-300 hover:text-orange-400 font-medium py-2">الأخبار</a>
+                    <a href="about.html" class="block text-gray-300 hover:text-orange-400 font-medium py-2">من نحن</a>
+                    <a href="contact.html" class="block text-gray-300 hover:text-orange-400 font-medium py-2">اتصل بنا</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <section class="pt-24 pb-12 bg-gradient-to-b from-gray-900 to-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-6xl font-bold font-arabic mb-4">
+                    <span class="gradient-text">المباريات</span>
+                </h1>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+                    متابعة حية لجميع المباريات، نتائج لحظية، وجدول المباريات القادمة في جميع البطولات
+                </p>
+            </div>
+            
+            <!-- Competition Filters -->
+            <div class="competition-tabs justify-center mb-8">
+                <button class="filter-btn active px-6 py-3 rounded-lg bg-gray-800 text-white font-semibold whitespace-nowrap" data-competition="all">
+                    جميع البطولات
+                </button>
+                <button class="filter-btn px-6 py-3 rounded-lg bg-gray-800 text-gray-300 font-semibold whitespace-nowrap" data-competition="premier-league">
+                    الدوري الإنجليزي
+                </button>
+                <button class="filter-btn px-6 py-3 rounded-lg bg-gray-800 text-gray-300 font-semibold whitespace-nowrap" data-competition="la-liga">
+                    الدوري الإسباني
+                </button>
+                <button class="filter-btn px-6 py-3 rounded-lg bg-gray-800 text-gray-300 font-semibold whitespace-nowrap" data-competition="champions-league">
+                    دوري الأبطال
+                </button>
+                <button class="filter-btn px-6 py-3 rounded-lg bg-gray-800 text-gray-300 font-semibold whitespace-nowrap" data-competition="arab-championships">
+                    البطولات العربية
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Matches Section -->
+    <section class="py-12 bg-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center mb-8">
+                <div class="live-indicator w-3 h-3 bg-red-500 rounded-full mr-3"></div>
+                <h2 class="text-3xl font-bold font-arabic text-white">مباريات حية الآن</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+                <!-- Live Match 1 -->
+                <div class="match-card bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl p-6 border border-red-500/30" data-competition="premier-league">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="live-indicator w-3 h-3 bg-red-500 rounded-full"></div>
+                            <span class="text-red-500 font-bold text-sm">مباشر</span>
+                        </div>
+                        <span class="text-gray-400 text-sm">الدوري الإنجليزي</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="text-center flex-1">
+                            <div class="w-20 h-20 bg-gray-700 rounded-full mb-3 flex items-center justify-center mx-auto">
+                                <span class="text-3xl">🔴</span>
+                            </div>
+                            <h3 class="font-bold text-xl mb-1">ليفربول</h3>
+                            <p class="text-gray-400 text-sm">Liverpool</p>
+                        </div>
+                        
+                        <div class="text-center mx-8">
+                            <div class="score-display text-5xl font-bold gradient-text mb-2">1 - 1</div>
+                            <div class="text-gray-400 text-sm">الدقيقة <span class="match-minute">67</span></div>
+                            <div class="text-orange-400 text-xs mt-1">استاد أنفيلد</div>
+                        </div>
+                        
+                        <div class="text-center flex-1">
+                            <div class="w-20 h-20 bg-gray-700 rounded-full mb-3 flex items-center justify-center mx-auto">
+                                <span class="text-3xl">🔵</span>
+                            </div>
+                            <h3 class="font-bold text-xl mb-1">مانشستر سيتي</h3>
+                            <p class="text-gray-400 text-sm">Man City</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-center space-x-4">
+                        <button class="bg-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                            متابعة المباراة
+                        </button>
+                        <button class="border border-gray-600 text-gray-300 px-6 py-2 rounded-lg font-semibold hover:bg-gray-700 transition-colors">
+                            تفاصيل المباراة
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Match 2 -->
+                <div class="match-card bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl p-6 border border-red-500/30" data-competition="la-liga">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="live-indicator w-3 h-3 bg-red-500 rounded-full"></div>
+                            <span class="text-red-500 font-bold text-sm">مباشر</span>
+                        </div>
+                        <span class="text-gray-400 text-sm">الدوري الإسباني</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="text-center flex-1">
+                            <div class="w-20 h-20 bg-gray-700 rounded-full mb-3 flex items-center justify-center mx-auto">
+                                <span class="text-3xl">⚪</span>
+                            </div>
+                            <h3 class="font-bold text-xl mb-1">ريال مدريد</h3>
+                            <p class="text-gray-400 text-sm">Real Madrid</p>
+                        </div>
+                        
+                        <div class="text-center mx-8">
+                            <div class="score-display text-5xl font-bold gradient-text mb-2">2 - 1</div>
+                            <div class="text-gray-400 text-sm">الدقيقة <span class="match-minute">73</span></div>
+                            <div class="text-orange-400 text-xs mt-1">سانتياغو برنابيو</div>
+                        </div>
+                        
+                        <div class="text-center flex-1">
+                            <div class="w-20 h-20 bg-gray-700 rounded-full mb-3 flex items-center justify-center mx-auto">
+                                <span class="text-3xl">🔴</span>
+                            </div>
+                            <h3 class="font-bold text-xl mb-1">برشلونة</h3>
+                            <p class="text-gray-400 text-sm">Barcelona</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-center space-x-4">
+                        <button class="bg-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                            متابعة المباراة
+                        </button>
+                        <button class="border border-gray-600 text-gray-300 px-6 py-2 rounded-lg font-semibold hover:bg-gray-700 transition-colors">
+                            تفاصيل المباراة
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Today's Matches -->
+    <section class="py-12 bg-gradient-to-b from-black to-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold font-arabic text-white mb-8">مباريات اليوم</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Match 1 -->
+                <div class="match-card bg-gray-800 rounded-xl p-6" data-competition="champions-league">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-blue-500 font-bold text-sm">قادمة</span>
+                        <span class="text-gray-400 text-sm">21:00</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gray-700 rounded-full mr-3 flex items-center justify-center">
+                                <span class="text-xl">🔴</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">بايرن ميونخ</h4>
+                                <p class="text-gray-400 text-sm">Bayern Munich</p>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-gray-400">VS</div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div>
+                                <h4 class="font-semibold">باريس سان جيرمان</h4>
+                                <p class="text-gray-400 text-sm">PSG</p>
+                            </div>
+                            <div class="w-12 h-12 bg-gray-700 rounded-full mr-3 flex items-center justify-center">
+                                <span class="text-xl">🔵</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button class="w-full bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors">
+                            تذكير بالمباراة
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Match 2 -->
+                <div class="match-card bg-gray-800 rounded-xl p-6" data-competition="premier-league">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-blue-500 font-bold text-sm">قادمة</span>
+                        <span class="text-gray-400 text-sm">19:30</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gray-700 rounded-full mr-3 flex items-center justify-center">
+                                <span class="text-xl">🔴</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">مانشستر يونايتد</h4>
+                                <p class="text-gray-400 text-sm">Man United</p>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-gray-400">VS</div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div>
+                                <h4 class="font-semibold">تشيلسي</h4>
+                                <p class="text-gray-400 text-sm">Chelsea</p>
+                            </div>
+                            <div class="w-12 h-12 bg-gray-700 rounded-full mr-3 flex items-center justify-center">
+                                <span class="text-xl">🔵</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button class="w-full bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors">
+                            تذكير بالمباراة
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Match 3 -->
+                <div class="match-card bg-gray-800 rounded-xl p-6" data-competition="arab-championships">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-blue-500 font-bold text-sm">قادمة</span>
+                        <span class="text-gray-400 text-sm">20:00</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gray-700 rounded-full mr-3 flex items-center justify-center">
+                                <span class="text-xl">🟢</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">المنتخب السعودي</h4>
+                                <p class="text-gray-400 text-sm">Saudi Arabia</p>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-gray-400">VS</div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div>
+                                <h4 class="font-semibold">المنتخب المصري</h4>
+                                <p class="text-gray-400 text-sm">Egypt</p>
+                            </div>
+                            <div class="w-12 h-12 bg-gray-700 rounded-full mr-3 flex items-center justify-center">
+                                <span class="text-xl">🔴</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button class="w-full bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors">
+                            تذكير بالمباراة
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Yesterday's Results -->
+    <section class="py-12 bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold font-arabic text-white mb-8">نتائج الأمس</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Finished Match 1 -->
+                <div class="match-card bg-gray-800 rounded-xl p-6" data-competition="champions-league">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-green-500 font-bold text-sm">انتهت</span>
+                        <span class="text-gray-400 text-sm">أمس</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gray-700 rounded-full mr-3 flex items-center justify-center">
+                                <span class="text-xl">⚫</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">إنتر ميلان</h4>
+                                <p class="text-gray-400 text-sm">Inter Milan</p>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-white">3 - 1</div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div>
+                                <h4 class="font-semibold">آرسنال</h4>
+                                <p class="text-gray-400 text-sm">Arsenal</p>
+                            </div>
+                            <div class="w-12 h-12 bg-gray-700 rounded-full mr-3 flex items-center justify-center">
+                                <span class="text-xl">🔴</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button class="w-full border border-gray-600 text-gray-300 py-2 rounded-lg font-semibold hover:bg-gray-700 transition-colors">
+                            تفاصيل المباراة
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Finished Match 2 -->
+                <div class="match-card bg-gray-800 rounded-xl p-6" data-competition="la-liga">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-green-500 font-bold text-sm">انتهت</span>
+                        <span class="text-gray-400 text-sm">أمس</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gray-700 rounded-full mr-3 flex items-center justify-center">
+                                <span class="text-xl">🟡</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">فياريال</h4>
+                                <p class="text-gray-400 text-sm">Villarreal</p>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-white">2 - 2</div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div>
+                                <h4 class="font-semibold">أتلتيكو مدريد</h4>
+                                <p class="text-gray-400 text-sm">Atletico Madrid</p>
+                            </div>
+                            <div class="w-12 h-12 bg-gray-700 rounded-full mr-3 flex items-center justify-center">
+                                <span class="text-xl">🔴</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button class="w-full border border-gray-600 text-gray-300 py-2 rounded-lg font-semibold hover:bg-gray-700 transition-colors">
+                            تفاصيل المباراة
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Finished Match 3 -->
+                <div class="match-card bg-gray-800 rounded-xl p-6" data-competition="arab-championships">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-green-500 font-bold text-sm">انتهت</span>
+                        <span class="text-gray-400 text-sm">أمس</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gray-700 rounded-full mr-3 flex items-center justify-center">
+                                <span class="text-xl">🔴</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">البرازيل</h4>
+                                <p class="text-gray-400 text-sm">Brazil</p>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-white">2 - 1</div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div>
+                                <h4 class="font-semibold">الأرجنتين</h4>
+                                <p class="text-gray-400 text-sm">Argentina</p>
+                            </div>
+                            <div class="w-12 h-12 bg-gray-700 rounded-full mr-3 flex items-center justify-center">
+                                <span class="text-xl">🔵</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button class="w-full border border-gray-600 text-gray-300 py-2 rounded-lg font-semibold hover:bg-gray-700 transition-colors">
+                            تفاصيل المباراة
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="py-16 bg-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold font-arabic text-white mb-12 text-center">إحصائيات المباريات</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Total Matches -->
+                <div class="bg-gray-800 rounded-xl p-6 text-center">
+                    <div class="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-2">156</h3>
+                    <p class="text-gray-400">مباراة هذا الأسبوع</p>
+                </div>
+
+                <!-- Live Matches -->
+                <div class="bg-gray-800 rounded-xl p-6 text-center">
+                    <div class="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-2">8</h3>
+                    <p class="text-gray-400">مباراة حية الآن</p>
+                </div>
+
+                <!-- Goals Today -->
+                <div class="bg-gray-800 rounded-xl p-6 text-center">
+                    <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-2">42</h3>
+                    <p class="text-gray-400">هدف اليوم</p>
+                </div>
+
+                <!-- Championships -->
+                <div class="bg-gray-800 rounded-xl p-6 text-center">
+                    <div class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-2">12</h3>
+                    <p class="text-gray-400">بطولة نشطة</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Logo & Description -->
+                <div class="md:col-span-2">
+                    <h3 class="text-3xl font-bold font-arabic mb-4">
+                        <span class="gradient-text">Sports</span><span class="text-white">Pulse</span>
+                    </h3>
+                    <p class="text-gray-400 mb-6 max-w-md">
+                        بوابتك الشاملة للعالم الرياضي. نقدم لك آخر الأخبار، النتائج الحية، والتحليلات العميقة مع التزامنا بالجودة والدقة.
+                    </p>
+                    
+                    <!-- Social Links -->
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors">
+                            <span class="text-white">f</span>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors">
+                            <span class="text-white">t</span>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors">
+                            <span class="text-white">i</span>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors">
+                            <span class="text-white">y</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-bold text-white mb-4">روابط سريعة</h4>
+                    <ul class="space-y-3">
+                        <li><a href="index.html" class="text-gray-400 hover:text-orange-400 transition-colors">الرئيسية</a></li>
+                        <li><a href="matches.html" class="text-gray-400 hover:text-orange-400 transition-colors">المباريات</a></li>
+                        <li><a href="news.html" class="text-gray-400 hover:text-orange-400 transition-colors">الأخبار</a></li>
+                        <li><a href="about.html" class="text-gray-400 hover:text-orange-400 transition-colors">من نحن</a></li>
+                        <li><a href="contact.html" class="text-gray-400 hover:text-orange-400 transition-colors">اتصل بنا</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Categories -->
+                <div>
+                    <h4 class="text-lg font-bold text-white mb-4">الفئات</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-orange-400 transition-colors">كرة قدم</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-orange-400 transition-colors">كرة سلة</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-orange-400 transition-colors">تنس</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-orange-400 transition-colors">فورمولا 1</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-orange-400 transition-colors">رياضات أخرى</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center">
+                <p class="text-gray-400">
+                    © 2024 SportsPulse. جميع الحقوق محفوظة | تصميم وتطوير بروفشنال
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        // Matches page specific functionality
+        class MatchesPage {
+            constructor() {
+                this.setupFilterButtons();
+                this.initializeLiveUpdates();
+                this.setupMatchButtons();
+            }
+
+            setupFilterButtons() {
+                const filterButtons = document.querySelectorAll('.filter-btn');
+                const matchCards = document.querySelectorAll('.match-card');
+
+                filterButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        // Update active button
+                        filterButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+
+                        const competition = button.dataset.competition;
+
+                        // Filter matches
+                        matchCards.forEach(card => {
+                            if (competition === 'all' || card.dataset.competition === competition) {
+                                card.style.display = 'block';
+                                anime({
+                                    targets: card,
+                                    opacity: [0, 1],
+                                    translateY: [20, 0],
+                                    duration: 300,
+                                    easing: 'easeOutQuad'
+                                });
+                            } else {
+                                anime({
+                                    targets: card,
+                                    opacity: [1, 0],
+                                    translateY: [0, -20],
+                                    duration: 200,
+                                    easing: 'easeInQuad',
+                                    complete: () => {
+                                        card.style.display = 'none';
+                                    }
+                                });
+                            }
+                        });
+                    });
+                });
+            }
+
+            initializeLiveUpdates() {
+                // Simulate live score updates
+                setInterval(() => {
+                    this.updateLiveScores();
+                }, 15000); // Update every 15 seconds
+
+                // Update match minutes
+                setInterval(() => {
+                    this.updateMatchMinutes();
+                }, 60000); // Update every minute
+            }
+
+            updateLiveScores() {
+                const liveMatches = document.querySelectorAll('.match-card.border-red-500\\/30');
+                
+                liveMatches.forEach(match => {
+                    const scoreElement = match.querySelector('.score-display');
+                    if (scoreElement && Math.random() > 0.8) { // 20% chance of score update
+                        this.simulateScoreChange(scoreElement);
+                    }
+                });
+            }
+
+            simulateScoreChange(scoreElement) {
+                // Add score update animation
+                scoreElement.classList.add('score-update');
+                
+                // Simulate score change (in real app, this would come from API)
+                setTimeout(() => {
+                    const currentScore = scoreElement.textContent;
+                    const [home, away] = currentScore.split(' - ').map(Number);
+                    
+                    // Randomly increment one score
+                    if (Math.random() > 0.5) {
+                        scoreElement.textContent = `${home + 1} - ${away}`;
+                    } else {
+                        scoreElement.textContent = `${home} - ${away + 1}`;
+                    }
+                }, 300);
+
+                // Remove animation class
+                setTimeout(() => {
+                    scoreElement.classList.remove('score-update');
+                }, 600);
+            }
+
+            updateMatchMinutes() {
+                const minuteElements = document.querySelectorAll('.match-minute');
+                minuteElements.forEach(minuteEl => {
+                    const currentMinute = parseInt(minuteEl.textContent);
+                    if (currentMinute < 90) {
+                        minuteEl.textContent = currentMinute + 1;
+                    }
+                });
+            }
+
+            setupMatchButtons() {
+                // Follow match buttons
+                document.querySelectorAll('button').forEach(button => {
+                    if (button.textContent.includes('متابعة') || button.textContent.includes('تذكير')) {
+                        button.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            
+                            const message = button.textContent.includes('متابعة') ? 
+                                'سيتم إشعارك بأحدث المباراة!' : 
+                                'سنرسل لك تذكيراً قبل المباراة!';
+                            
+                            // Show notification using SportsPulse method
+                            if (window.sportsPulse) {
+                                window.sportsPulse.showNotification(message, 'success');
+                            }
+                            
+                            // Animate button
+                            anime({
+                                targets: button,
+                                scale: [1, 0.95, 1],
+                                duration: 200,
+                                easing: 'easeInOutQuad'
+                            });
+                        });
+                    }
+                });
+            }
+        }
+
+        // Initialize matches page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.matchesPage = new MatchesPage();
+        });
+    </script>
+</body>
+</html>
